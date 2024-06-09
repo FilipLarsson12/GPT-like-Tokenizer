@@ -21,6 +21,18 @@ class Tokenizer:
         # Sort the pair counts to be descending (most frequently-occuring pair at position 0)
         counts = dict(sorted(counts.items(), key=lambda item: item[1], reverse=True))
         return counts
+    
+    def merge(text, pair, new_id):
+        i = 0
+        while i < (len(text)-1):
+            current_pair = (text[i], text[i+1])
+            print(current_pair)
+            if current_pair == pair:
+                text.pop(i)
+                text.pop(i)
+                text.insert(i, new_id)
+            i += 1
+        return text
 
 
     def train(self, text, vocab_size, verbose=False):
