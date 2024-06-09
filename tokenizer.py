@@ -92,3 +92,16 @@ class Tokenizer:
         tokens = b"".join(self.vocab[id] for id in tokens)
         text = tokens.decode("utf-8", errors="replace")
         return text
+
+
+    # return the n longest tokens in our vocabulary to get a sense of the longest tokens that we created during training
+    def get_longest_tokens(self, n):
+        longest_tokens = []
+        for i in range(n):
+            longest_tokens.append(self.vocab[len(self.vocab.items())-n+i])
+        return longest_tokens
+    
+    # take in string and return a new text but with * signs between the tokens created by the tokenizer
+    def visualize_tokens(self, string):
+        tokens = self.encode(string)
+        
