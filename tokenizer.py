@@ -106,4 +106,5 @@ class Tokenizer:
         tokens = self.encode(string)
         tokens = [self.vocab[token] for token in tokens]
         tokens = b"*".join(tokens)
+        tokens = tokens.decode('utf-8')
         return tokens
