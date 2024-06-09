@@ -52,3 +52,11 @@ class Tokenizer:
 
         print("Text after merges: ", text)
         print("Merges: ", self.merges)
+
+        # Base vocabulary
+        self.vocab = {idx: bytes([idx]) for idx in range(256)}
+        # Creating all new tokens in vocab based on the most frequently occuring pairs in the text
+        for (id1, id2), new_id in self.merges.items():
+            self.vocab[new_id] = self.vocab[id1] + self.vocab[id2]
+        
+            
