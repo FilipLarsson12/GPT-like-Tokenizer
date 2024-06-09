@@ -26,6 +26,7 @@ def main():
     ten_longest_tokens = my_tokenizer.get_longest_tokens(10)
     print(ten_longest_tokens)
 
+    print(my_tokenizer.visualize_tokens("cody"))
 # Ensure the main function is called when the script is executed
 if __name__ == "__main__":
     main()

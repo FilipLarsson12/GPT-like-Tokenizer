@@ -104,4 +104,6 @@ class Tokenizer:
     # take in string and return a new text but with * signs between the tokens created by the tokenizer
     def visualize_tokens(self, string):
         tokens = self.encode(string)
-        
+        tokens = [self.vocab[token] for token in tokens]
+        tokens = b"*".join(tokens)
+        return tokens
