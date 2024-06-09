@@ -1,8 +1,16 @@
+import regex as re
+
 class Tokenizer:
     def __init__(self):
+        # Vocabulary
         self.vocab = {}
+        # Keep track of which tokens merge into which other tokens
         self.merges = {}
-        
+        # Identical Regex pattern that GPT-4 uses to separate the training text to counteract multiple tokens for the same word
+        # For example we dont want separate tokens for: 'hello.', 'hello!' and 'hello?'. We probably just want: 'hello'.
+        self.regex_pattern = r"""'(?i:[sdmt]|ll|ve|re)|[^\r\n\p{L}\p{N}]?+\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]++[\r\n]*|\s*[\r\n]|\s+(?!\S)|\s+"""
+
+
     # Simple helper function to encode the text
     def encode_text(self, text):
         tokens = text.encode("utf-8")
