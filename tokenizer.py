@@ -60,7 +60,7 @@ class Tokenizer:
         for (id1, id2), new_id in self.merges.items():
             self.vocab[new_id] = self.vocab[id1] + self.vocab[id2]
         
-
+    # Takes in a text and returns the encoding by the tokenizer
     def encode(self, text):
         # Encode the text with utf-8 to start
         tokens = text.encode("utf-8")
@@ -85,3 +85,10 @@ class Tokenizer:
                 return tokens
         # We come here if we have only a single token with no possible pairs
         return tokens
+    
+
+    # Takes the encoding from the tokenizer and returns the text
+    def decode(self, tokens):
+        tokens = b"".join(self.vocab[id] for id in tokens)
+        text = tokens.decode("utf-8", errors="replace")
+        return text
