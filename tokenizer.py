@@ -2,7 +2,7 @@ class Tokenizer:
     def __init__(self):
         self.vocab = {}
         self.merges = {}
-
+        
     # Simple helper function to encode the text
     def encode_text(self, text):
         tokens = text.encode("utf-8")
@@ -53,10 +53,35 @@ class Tokenizer:
         print("Text after merges: ", text)
         print("Merges: ", self.merges)
 
-        # Base vocabulary
+        # Building out our Vocabulary
+        # Base Vocab
         self.vocab = {idx: bytes([idx]) for idx in range(256)}
-        # Creating all new tokens in vocab based on the most frequently occuring pairs in the text
+        # + All new ids based on the most frequently occuring pairs in the text
         for (id1, id2), new_id in self.merges.items():
             self.vocab[new_id] = self.vocab[id1] + self.vocab[id2]
         
-            
+
+    def encode(self, text):
+        # Encode the text with utf-8 to start
+        tokens = text.encode("utf-8")
+        tokens = list(map(int, tokens))
+        # Find all pairs in the tokens
+        while True and len(tokens) >= 2:
+            pairs = list(k for k, v in self.count_pairs(tokens).items())
+            # Replace the pairs in tokens that has been reassigned to new ids in merges dict.
+            # Start with the pairs that appear at the start of merges and move downwards
+            best_pair_to_replace = None
+            lowest_value_in_merges = 256+len(self.merges.items())
+            for pair in pairs:
+                if pair in self.merges and self.merges[pair] < lowest_value_in_merges:
+                    best_pair_to_replace = pair
+                    lowest_value_in_merges = self.merges[pair]
+
+            if best_pair_to_replace:
+                # Replace the pair with its new token_id
+                tokens = self.merge(tokens, best_pair_to_replace, lowest_value_in_merges)
+            else:
+                # If no pair in our tokens exist in merges then we cant merge pairs anymore and we return the encoded text
+                return tokens
+        # We come here if we have only a single token with no possible pairs
+        return tokens

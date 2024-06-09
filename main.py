@@ -3,8 +3,10 @@ from tokenizer import Tokenizer
 def main():
 
     my_tokenizer = Tokenizer()
-    pairs = my_tokenizer.train("aaaaaaaaaabbbbbbbcccc", 260)
-
+    my_tokenizer.train("hhhhhhh", 260)
+    string = "hhhejj"
+    encoding = my_tokenizer.encode(string)
+    print(f"Encoding: {encoding} of string: {my_tokenizer.encode_text(string)}")
     # HALLOOOOOOOOOOOOO
 
 # Ensure the main function is called when the script is executed
