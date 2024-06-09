@@ -17,6 +17,17 @@ class Tokenizer:
         tokens = list(map(int, tokens))
         return tokens
 
+    def merge_dictionaries(self, dict1, dict2):
+        merged_dict = dict1.copy()  # Start with the keys and values of dict1
+
+        for key, value in dict2.items():
+            if key in merged_dict:
+                merged_dict[key] += value  # If key exists, add the values
+            else:
+                merged_dict[key] = value  # If key does not exist, add the key-value pair
+
+        return merged_dict
+
     # Find all the character-pairs in a text and return them in a dict
     def count_pairs(self, text):
         counts = {}
@@ -26,8 +37,6 @@ class Tokenizer:
             else:
                 counts[(ch1, ch2)] = 1
 
-        # Sort the pair counts to be descending (most frequently-occuring pair at position 0)
-        counts = dict(sorted(counts.items(), key=lambda item: item[1], reverse=True))
         return counts
     
     def merge(self, text, pair, new_id):
@@ -44,21 +53,27 @@ class Tokenizer:
 
 
     def train(self, text, vocab_size, verbose=False):
+        splitted_text = re.findall(self.regex_pattern, text)
         text = self.encode_text(text)
-
+        splitted_text = [self.encode_text(part) for part in splitted_text]
+        print(splitted_text)
         add_elms = vocab_size - 256
 
-        print("Text before merges: ", text)
         for i in range(add_elms):
-            pair_counts = self.count_pairs(text)
-            print(pair_counts)
-            pair_to_replace = list(pair_counts.items())[0][0]
+            overall_counts = {}
+            for part in splitted_text:
+                
+                pair_counts = self.count_pairs(part)
+                
+                overall_counts = self.merge_dictionaries(overall_counts, pair_counts)
+            # Sort the pair counts to be descending (most frequently-occuring pair at position 0)
+            overall_counts = dict(sorted(overall_counts.items(), key=lambda item: item[1], reverse=True))
 
-            print(f"Replacing all occurences of: {pair_to_replace} with {256+i}")
+            if len(overall_counts.items()) > 0:
+                pair_to_replace = list(overall_counts.items())[0][0]
+                print(f"Replacing all occurences of: {pair_to_replace} with {256+i}")
+                splitted_text = [self.merge(part, pair_to_replace, 256+i) for part in splitted_text]
 
-            text = self.merge(text, pair_to_replace, 256+i)
-
-        print("Text after merges: ", text)
         print("Merges: ", self.merges)
 
         # Building out our Vocabulary
