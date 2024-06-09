@@ -1,7 +1,13 @@
 class Tokenizer:
     def __init__(self):
         self.vocab = {}
+        self.merges = {}
 
+    # Simple helper function to encode the text
+    def encode_text(self, text):
+        tokens = text.encode("utf-8")
+        tokens = list(map(int, tokens))
+        return tokens
 
     # Find all the character-pairs in a text and return them in a dict
     def find_pairs(self, text):
@@ -18,10 +24,13 @@ class Tokenizer:
 
 
     def train(self, text, vocab_size, verbose=False):
-        self.vocab = {bytes([idx]): idx for idx in range(256)}
+        text = self.encode_text(text)
+
+        self.vocab = {idx: bytes([idx]) for idx in range(256)}
 
         add_elms = vocab_size - 256
-
         pair_counts = self.find_pairs(text)
+        print(pair_counts)
+        pairs_to_add = list(pair_counts.items())[:add_elms]
+        
 
-    

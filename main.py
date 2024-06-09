@@ -3,8 +3,8 @@ from tokenizer import Tokenizer
 def main():
 
     my_tokenizer = Tokenizer()
-    pairs = my_tokenizer.find_pairs("aaaaaaffggggeeeeeeeeee")
-    print(pairs)
+    pairs = my_tokenizer.train("bccccaaa", 258)
+    
     # HALLOOOOOOOOOOOOO
 
 # Ensure the main function is called when the script is executed
