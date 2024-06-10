@@ -74,10 +74,9 @@ class Tokenizer:
 
             if len(overall_counts.items()) > 0:
                 pair_to_replace = list(overall_counts.items())[0][0]
-                print(f"Replacing all occurences of: {pair_to_replace} with {256+i}")
+                print(f"Replacing all occurences of tokens: {pair_to_replace} with token: {256+i}")
                 splitted_text = [self.merge(part, pair_to_replace, 256+i) for part in splitted_text]
 
-        print("Merges: ", self.merges)
 
         # Building out our Vocabulary
         # Base Vocab
@@ -137,66 +136,3 @@ class Tokenizer:
         return tokens
 
 
-    # These functions will be used just to test the Tokenizer against the real GPT-4 tokenizer. 
-    # The GPT-4 Merges dictionary can only be obtained by: 
-    # Either training the Tokenizer on the identical training data as GPT-4 Tokenizer
-    # Or simply copying the complete merges dict directly from OpenAI githu
-    # The merges is necessary to be able to produce identical tokens as GPT-4 Tokenizer.
-
-    # Takes a merged token and return the pair inside it that got merged first
-    def swap_positions(self, mergeable_ranks):
-        for i in range(256):
-            # Convert i to bytes
-            i_bytes = bytes([i])
-            
-            # Check if i_bytes is a key in mergeable_ranks
-            if i_bytes in mergeable_ranks:
-                # Get the rank corresponding to i_bytes
-                rank = mergeable_ranks[i_bytes]
-                
-                # Find the bytes key for the rank value
-                rank_bytes = bytes([rank])
-                
-                # Swap the positions if rank_bytes is also a key in mergeable_ranks
-                if rank_bytes in mergeable_ranks:
-                    # Swap the values
-                    mergeable_ranks[i_bytes], mergeable_ranks[rank_bytes] = mergeable_ranks[rank_bytes], mergeable_ranks[i_bytes]
-        
-        return mergeable_ranks
-
-    def find_first_merge(self, mergeable_ranks, token, max_rank):
-        parts = [bytes([b]) for b in token]
-        while True:
-            min_id = None
-            min_rank = None
-            for i, pair in enumerate(zip(parts[:-1], parts[1:])):
-                rank = mergeable_ranks.get(pair[0] + pair[1])
-                if rank is not None and (min_rank is None or rank < min_rank):
-                    min_id = i
-                    min_rank = rank
-            if min_rank is None or (max_rank is not None and min_rank >= max_rank):
-                break
-            assert min_id is not None
-            parts = parts[:min_id] + [parts[min_id] + parts[min_id + 1]] + parts[min_id + 2:]
-        return parts
-    
-
-    def recover_gpt4_merges_and_vocab(self):
-        enc = tiktoken.get_encoding("cl100k_base")
-        mergeable_ranks = enc._mergeable_ranks
-        self.merges = {}
-        for token, rank in mergeable_ranks.items():
-            if len(token) == 1:
-                continue
-            pair = tuple(self.find_first_merge(mergeable_ranks, token, rank))
-            assert len(pair) == 2
-            ix0 = mergeable_ranks[pair[0]]
-            ix1 = mergeable_ranks[pair[1]]            
-            self.merges[(ix0, ix1)] = rank
-
-        vocab = {idx: bytes([idx]) for idx in range(256)}
-        for (ix0, ix1), rank in self.merges.items():
-            vocab[rank] = vocab[ix0] + vocab[ix1]
-        self.vocab = vocab
-
-        mergeable_ranks = self.swap_positions(mergeable_ranks)
