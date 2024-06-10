@@ -12,19 +12,20 @@ class Tokenizer:
 
 
     # Simple helper function to encode the text
-    def encode_text(self, text):
+    def basic_encode(self, text):
         tokens = text.encode("utf-8")
         tokens = list(map(int, tokens))
         return tokens
 
+    # Helper function to merge two dictionaries
     def merge_dictionaries(self, dict1, dict2):
-        merged_dict = dict1.copy()  # Start with the keys and values of dict1
+        merged_dict = dict1.copy()  
 
         for key, value in dict2.items():
             if key in merged_dict:
-                merged_dict[key] += value  # If key exists, add the values
+                merged_dict[key] += value 
             else:
-                merged_dict[key] = value  # If key does not exist, add the key-value pair
+                merged_dict[key] = value 
 
         return merged_dict
 
@@ -54,8 +55,8 @@ class Tokenizer:
 
     def train(self, text, vocab_size, verbose=False):
         splitted_text = re.findall(self.regex_pattern, text)
-        text = self.encode_text(text)
-        splitted_text = [self.encode_text(part) for part in splitted_text]
+        text = self.basic_encode(text)
+        splitted_text = [self.basic_encode(part) for part in splitted_text]
         print(splitted_text)
         add_elms = vocab_size - 256
 
@@ -122,6 +123,8 @@ class Tokenizer:
         longest_tokens = []
         for i in range(n):
             longest_tokens.append(self.vocab[len(self.vocab.items())-n+i])
+        longest_tokens = [token.decode('utf-8') for token in longest_tokens]
+        longest_tokens.reverse()
         return longest_tokens
     
     # take in string and return a new text but with * signs between the tokens created by the tokenizer
