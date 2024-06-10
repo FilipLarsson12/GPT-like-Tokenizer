@@ -11,7 +11,7 @@ def main():
 
     # Initializing and training the tokenizer, size of vocabulary is a hyperparameter, I chose 400 for example
     my_tokenizer = Tokenizer()
-    my_tokenizer.train(text, 700)
+    my_tokenizer.train(text, 500)
 
     text2 = my_tokenizer.decode(my_tokenizer.encode(text))
     print(text2 == text)
@@ -36,6 +36,7 @@ def main():
     gpt4_dec = gpt4_tokenizer.decode(gpt4_enc) # get the same text back
 
     # Using my own Tokenizer
+    my_tokenizer.recover_gpt4_merges_and_vocab()
     my_tokenizer_enc = my_tokenizer.encode(test_string)
     my_tokenizer_dec = my_tokenizer.decode(my_tokenizer_enc)
 
@@ -44,6 +45,7 @@ def main():
     print(f"GPT-4 Tokenizer: \nOriginal String: {test_string}\nEncoding: {gpt4_enc}\nEncoding -> Decoding: {gpt4_dec}")
     print("- - - - - - - - - - - - - - - -")
     print(f"My Tokenizer: \nOriginal String: {test_string}\nEncoding: {my_tokenizer_enc}\nEncoding -> Decoding: {my_tokenizer_dec}")
+
 
 
 # Ensure the main function is called when the script is executed
